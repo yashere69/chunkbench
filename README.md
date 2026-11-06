@@ -93,8 +93,17 @@ strings, which is what lets the metrics intersect them exactly with the excerpts
   excerpts: ["₹1,499 से ऊपर के प्रीपेड ऑर्डर पर शिपिंग मुफ़्त है।"]
 ```
 
-Every excerpt must appear verbatim in its document, and chunkbench stops with an error if
-one doesn't. That catches labels drifting out of date when a document is edited.
+Every excerpt must appear in its document. Differences in whitespace are allowed, since
+an excerpt copied from a rendered page has spaces where the source has line breaks.
+Anything else is an error, which catches labels drifting out of date when a document is
+edited. `chunkbench check my-docs/` lists every broken excerpt at once, with the closest
+sentence in the document, so you can fix a question file in one pass:
+
+```
+$ chunkbench check my-docs/
+question 2: excerpt not in shipping-and-returns.md: 'We never ask for your card number or OTP.'; closest sentence: 'We never ask for your card number, PIN or OTP.'
+1 problem(s)
+```
 
 ## Related work and limits
 

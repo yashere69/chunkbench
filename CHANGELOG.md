@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+- Excerpts match across whitespace differences (copied from rendered pages)
+- `chunkbench check`: every broken excerpt at once, with the closest sentence
+- Malformed question files give a clear error
+
 ## 0.1.0
 
 - Strategies: fixed windows with overlap, recursive (danda-aware), markdown headings
