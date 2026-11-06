@@ -1,0 +1,83 @@
+# Each excerpt must appear verbatim in its document; chunkbench refuses to run otherwise.
+- q: Do you ship outside India?
+  doc: shipping-and-returns.md
+  excerpts: ["International shipping is not available yet."]
+- q: How long do made to order block printed pieces take before dispatch?
+  doc: shipping-and-returns.md
+  excerpts: ["Hand block printed pieces made to order take seven to ten working days before dispatch"]
+- q: How many days does delivery take to Ladakh or the north-east?
+  doc: shipping-and-returns.md
+  excerpts: ["North-east states, Jammu and Kashmir, Ladakh and the Andaman and Nicobar Islands can take up to twelve days."]
+- q: tracking page not updated what should I do
+  doc: shipping-and-returns.md
+  excerpts: ["If the tracking page has not updated for four days, write to us and we will chase the courier."]
+- q: What is the minimum order for free shipping?
+  doc: shipping-and-returns.md
+  excerpts: ["Shipping is free on prepaid orders above ₹1,499. Below that we charge ₹79."]
+- q: Is the cash on delivery fee refunded when I return?
+  doc: shipping-and-returns.md
+  excerpts: ["carries a fee of ₹49, which is not refunded if the order is returned."]
+- q: How many days do I have to return a kurta?
+  doc: shipping-and-returns.md
+  excerpts: ["You can return unworn, unwashed pieces with tags attached within seven days of delivery."]
+- q: Can I return a dupatta bought on sale?
+  doc: shipping-and-returns.md
+  excerpts: ["Some things cannot be returned: dupattas bought on sale, anything altered at your request, and innerwear."]
+- q: Can I exchange for a different size?
+  doc: shipping-and-returns.md
+  excerpts: ["We exchange for a different size once per order, free of charge, as long as the size is in stock. If it is not, we refund instead."]
+- q: When will I get my refund for a prepaid order?
+  doc: shipping-and-returns.md
+  excerpts: ["Prepaid orders are refunded to the original payment method within five working days of the return reaching our studio."]
+- q: Will you ask for my OTP for a COD refund?
+  doc: shipping-and-returns.md
+  excerpts: ["We never ask for your card number, PIN or OTP."]
+- q: The kurta arrived damaged, what now?
+  doc: shipping-and-returns.md
+  excerpts: ["send us a photo within 48 hours of delivery. We will send a replacement at no cost, or refund in full if a replacement is not possible."]
+- q: Why is the colour bleeding when I wash my block print?
+  doc: fabric-care.md
+  excerpts: ["colour can bleed in the first few washes. Wash the first time separately in cold water with a mild detergent."]
+- q: Is an uneven print a defect?
+  doc: fabric-care.md
+  excerpts: ["Small irregularities in the print, uneven edges or a slightly different shade between two pieces are part of hand printing and are not defects."]
+- q: Does mul cotton shrink?
+  doc: fabric-care.md
+  excerpts: ["Mul shrinks a little, about two percent, in the first wash"]
+- q: How do I store a chanderi dupatta with zari work?
+  doc: fabric-care.md
+  excerpts: ["store it folded in a muslin cloth rather than on a hanger, and keep it away from perfume, which tarnishes metallic thread."]
+- q: Why does my ajrakh smell?
+  doc: fabric-care.md
+  excerpts: ["ajrakh is a resist and mordant print from Kutch with a distinctive smell for the first few washes that fades with time."]
+- q: Can I iron over mirror work?
+  doc: fabric-care.md
+  excerpts: ["Never iron directly on embroidery, mirror work or printed areas with puff paint; place a cotton cloth over them."]
+- q: क्या विदेश में डिलीवरी होती है? पिन कोड पर डिलीवरी
+  doc: niti-hindi.md
+  lang: hi
+  excerpts: ["हम भारत के हर उस पिन कोड पर डिलीवरी करते हैं जहाँ हमारे कूरियर पार्टनर सेवा देते हैं।"]
+- q: मेट्रो शहरों में डिलीवरी में कितने दिन लगते हैं?
+  doc: niti-hindi.md
+  lang: hi
+  excerpts: ["मेट्रो शहरों में डिलीवरी में आम तौर पर तीन से पाँच दिन लगते हैं"]
+- q: मुफ़्त शिपिंग कितने के ऑर्डर पर है?
+  doc: niti-hindi.md
+  lang: hi
+  excerpts: ["₹1,499 से ऊपर के प्रीपेड ऑर्डर पर शिपिंग मुफ़्त है। इससे कम पर ₹79 लगते हैं।"]
+- q: कैश ऑन डिलीवरी शुल्क वापस होता है क्या?
+  doc: niti-hindi.md
+  lang: hi
+  excerpts: ["इसका शुल्क ₹49 है, जो रिटर्न होने पर वापस नहीं होता।"]
+- q: सेल में खरीदा दुपट्टा रिटर्न हो सकता है?
+  doc: niti-hindi.md
+  lang: hi
+  excerpts: ["सेल में खरीदे गए दुपट्टे और आपके कहने पर बदले गए कपड़े वापस नहीं लिए जाते।"]
+- q: प्रीपेड ऑर्डर का रिफ़ंड कब मिलेगा?
+  doc: niti-hindi.md
+  lang: hi
+  excerpts: ["प्रीपेड ऑर्डर का रिफ़ंड, सामान हमारे स्टूडियो पहुँचने के पाँच कार्य दिवसों के भीतर मूल भुगतान माध्यम में किया जाता है।"]
+- q: सामान ख़राब पहुँचा तो क्या करें?
+  doc: niti-hindi.md
+  lang: hi
+  excerpts: ["डिलीवरी के 48 घंटे के भीतर फ़ोटो भेजें।"]

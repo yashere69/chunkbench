@@ -10,7 +10,7 @@ from pathlib import Path
 from . import __version__
 from .bench import evaluate, load_corpus, load_questions
 
-DEFAULT = ["fixed:200,0", "fixed:400,200", "recursive:100", "recursive:200", "headings:200"]
+DEFAULT = ["fixed:50,0", "fixed:100,50", "recursive:30", "recursive:60", "headings:120"]
 
 
 def render(rows: list[dict]) -> str:
@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--questions", type=Path, help="YAML (default: <corpus>/questions.yaml)")
     r.add_argument("--strategy", action="append", help=f"repeatable (default: {DEFAULT})")
     r.add_argument("--unit", action="append", choices=["words", "chars", "graphemes"])
-    r.add_argument("-k", type=int, default=3, help="chunks retrieved per question")
+    r.add_argument("-k", type=int, default=2, help="chunks retrieved per question")
     r.add_argument("--json", type=Path)
     args = ap.parse_args(argv)
     try:
