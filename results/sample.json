@@ -1,0 +1,222 @@
+[
+ {
+  "strategy": "fixed:50,0",
+  "unit": "graphemes",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 22,
+  "avg_words": 45.2,
+  "recall": 78.2,
+  "precision": 15.2,
+  "iou": 15.0
+ },
+ {
+  "strategy": "fixed:50,0",
+  "unit": "graphemes",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 22,
+  "avg_words": 45.2,
+  "recall": 100.0,
+  "precision": 15.2,
+  "iou": 15.2
+ },
+ {
+  "strategy": "fixed:50,0",
+  "unit": "words",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 22,
+  "avg_words": 45.2,
+  "recall": 77.9,
+  "precision": 15.3,
+  "iou": 15.1
+ },
+ {
+  "strategy": "fixed:50,0",
+  "unit": "words",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 22,
+  "avg_words": 45.2,
+  "recall": 100.0,
+  "precision": 15.5,
+  "iou": 15.5
+ },
+ {
+  "strategy": "fixed:100,50",
+  "unit": "graphemes",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 19,
+  "avg_words": 94.5,
+  "recall": 100.0,
+  "precision": 9.1,
+  "iou": 9.1
+ },
+ {
+  "strategy": "fixed:100,50",
+  "unit": "graphemes",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 19,
+  "avg_words": 94.5,
+  "recall": 100.0,
+  "precision": 7.5,
+  "iou": 7.5
+ },
+ {
+  "strategy": "fixed:100,50",
+  "unit": "words",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 19,
+  "avg_words": 94.5,
+  "recall": 100.0,
+  "precision": 9.1,
+  "iou": 9.1
+ },
+ {
+  "strategy": "fixed:100,50",
+  "unit": "words",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 19,
+  "avg_words": 94.5,
+  "recall": 100.0,
+  "precision": 7.6,
+  "iou": 7.6
+ },
+ {
+  "strategy": "recursive:30",
+  "unit": "graphemes",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 46,
+  "avg_words": 21.6,
+  "recall": 68.7,
+  "precision": 27.5,
+  "iou": 27.0
+ },
+ {
+  "strategy": "recursive:30",
+  "unit": "graphemes",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 46,
+  "avg_words": 21.6,
+  "recall": 85.7,
+  "precision": 29.0,
+  "iou": 29.0
+ },
+ {
+  "strategy": "recursive:30",
+  "unit": "words",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 46,
+  "avg_words": 21.6,
+  "recall": 68.6,
+  "precision": 27.3,
+  "iou": 26.7
+ },
+ {
+  "strategy": "recursive:30",
+  "unit": "words",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 46,
+  "avg_words": 21.6,
+  "recall": 85.7,
+  "precision": 28.8,
+  "iou": 28.8
+ },
+ {
+  "strategy": "recursive:60",
+  "unit": "graphemes",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 25,
+  "avg_words": 39.8,
+  "recall": 94.4,
+  "precision": 19.8,
+  "iou": 19.8
+ },
+ {
+  "strategy": "recursive:60",
+  "unit": "graphemes",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 25,
+  "avg_words": 39.8,
+  "recall": 85.7,
+  "precision": 14.7,
+  "iou": 14.7
+ },
+ {
+  "strategy": "recursive:60",
+  "unit": "words",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 25,
+  "avg_words": 39.8,
+  "recall": 94.4,
+  "precision": 19.9,
+  "iou": 19.9
+ },
+ {
+  "strategy": "recursive:60",
+  "unit": "words",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 25,
+  "avg_words": 39.8,
+  "recall": 85.7,
+  "precision": 15.0,
+  "iou": 15.0
+ },
+ {
+  "strategy": "headings:120",
+  "unit": "graphemes",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 21,
+  "avg_words": 47.4,
+  "recall": 94.4,
+  "precision": 16.6,
+  "iou": 16.6
+ },
+ {
+  "strategy": "headings:120",
+  "unit": "graphemes",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 21,
+  "avg_words": 47.4,
+  "recall": 100.0,
+  "precision": 17.5,
+  "iou": 17.5
+ },
+ {
+  "strategy": "headings:120",
+  "unit": "words",
+  "lang": "en",
+  "questions": 18,
+  "chunks": 21,
+  "avg_words": 47.4,
+  "recall": 94.4,
+  "precision": 16.8,
+  "iou": 16.8
+ },
+ {
+  "strategy": "headings:120",
+  "unit": "words",
+  "lang": "hi",
+  "questions": 7,
+  "chunks": 21,
+  "avg_words": 47.4,
+  "recall": 100.0,
+  "precision": 17.8,
+  "iou": 17.8
+ }
+]

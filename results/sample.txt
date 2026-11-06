@@ -1,0 +1,24 @@
+3 documents, 25 questions, top-2 BM25
+
+strategy        lang  unit        chunks  words  recall   prec    IoU
+---------------------------------------------------------------------
+fixed:50,0      en    graphemes       22   45.2    78.2   15.2   15.0
+fixed:50,0      hi    graphemes       22   45.2   100.0   15.2   15.2
+fixed:50,0      en    words           22   45.2    77.9   15.3   15.1
+fixed:50,0      hi    words           22   45.2   100.0   15.5   15.5
+fixed:100,50    en    graphemes       19   94.5   100.0    9.1    9.1
+fixed:100,50    hi    graphemes       19   94.5   100.0    7.5    7.5
+fixed:100,50    en    words           19   94.5   100.0    9.1    9.1
+fixed:100,50    hi    words           19   94.5   100.0    7.6    7.6
+recursive:30    en    graphemes       46   21.6    68.7   27.5   27.0
+recursive:30    hi    graphemes       46   21.6    85.7   29.0   29.0
+recursive:30    en    words           46   21.6    68.6   27.3   26.7
+recursive:30    hi    words           46   21.6    85.7   28.8   28.8
+recursive:60    en    graphemes       25   39.8    94.4   19.8   19.8
+recursive:60    hi    graphemes       25   39.8    85.7   14.7   14.7
+recursive:60    en    words           25   39.8    94.4   19.9   19.9
+recursive:60    hi    words           25   39.8    85.7   15.0   15.0
+headings:120    en    graphemes       21   47.4    94.4   16.6   16.6
+headings:120    hi    graphemes       21   47.4   100.0   17.5   17.5
+headings:120    en    words           21   47.4    94.4   16.8   16.8
+headings:120    hi    words           21   47.4   100.0   17.8   17.8
