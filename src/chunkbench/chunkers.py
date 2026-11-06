@@ -118,9 +118,9 @@ def parse(spec: str) -> tuple[str, Chunker]:
     name, _, args = spec.partition(":")
     nums = [int(x) for x in args.split(",") if x] if args else []
     if name == "fixed":
-        return spec, fixed(*(nums or [200]))
+        return spec, fixed(nums[0] if nums else 200, nums[1] if len(nums) > 1 else 0)
     if name == "recursive":
-        return spec, recursive(*(nums or [200]))
+        return spec, recursive(nums[0] if nums else 200)
     if name == "headings":
-        return spec, headings(*(nums or [300]))
+        return spec, headings(nums[0] if nums else 300)
     raise ValueError(f"unknown strategy {name!r} (fixed, recursive, headings)")

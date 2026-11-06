@@ -40,15 +40,19 @@ def load_questions(path: Path, docs: dict[str, str]) -> list[Question]:
         for ex in q["excerpts"]:
             k = text.find(ex)
             if k == -1:
-                raise ValueError(f"question {i}: excerpt not found verbatim in {q['doc']}: "
-                                 f"{ex[:60]!r}")
+                raise ValueError(
+                    f"question {i}: excerpt not found verbatim in {q['doc']}: {ex[:60]!r}"
+                )
             spans.append((k, k + len(ex)))
         out.append(Question(q["q"], q["doc"], spans, q.get("lang", "en")))
     return out
 
 
 def evaluate(
-    docs: dict[str, str], questions: list[Question], strategies: list[str], k: int,
+    docs: dict[str, str],
+    questions: list[Question],
+    strategies: list[str],
+    k: int,
     unit_names: list[str],
 ) -> list[dict]:
     units = {u: {name: UNITS[u](text) for name, text in docs.items()} for u in unit_names}
@@ -65,11 +69,17 @@ def evaluate(
                 per_lang.setdefault((u, q.lang), []).append(score(units[u], rel, got))
         sizes = [len(docs[n][s:e].split()) for n, s, e in chunks]
         for (u, lang), scores in sorted(per_lang.items()):
-            rows.append({
-                "strategy": label, "unit": u, "lang": lang, "questions": len(scores),
-                "chunks": len(chunks), "avg_words": round(mean(sizes), 1),
-                "recall": round(100 * mean(s.recall for s in scores), 1),
-                "precision": round(100 * mean(s.precision for s in scores), 1),
-                "iou": round(100 * mean(s.iou for s in scores), 1),
-            })
+            rows.append(
+                {
+                    "strategy": label,
+                    "unit": u,
+                    "lang": lang,
+                    "questions": len(scores),
+                    "chunks": len(chunks),
+                    "avg_words": round(mean(sizes), 1),
+                    "recall": round(100 * mean(s.recall for s in scores), 1),
+                    "precision": round(100 * mean(s.precision for s in scores), 1),
+                    "iou": round(100 * mean(s.iou for s in scores), 1),
+                }
+            )
     return rows

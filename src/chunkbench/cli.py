@@ -14,8 +14,10 @@ DEFAULT = ["fixed:50,0", "fixed:100,50", "recursive:30", "recursive:60", "headin
 
 
 def render(rows: list[dict]) -> str:
-    head = (f"{'strategy':<16}{'lang':<6}{'unit':<11}{'chunks':>7}{'words':>7}"
-            f"{'recall':>8}{'prec':>7}{'IoU':>7}")
+    head = (
+        f"{'strategy':<16}{'lang':<6}{'unit':<11}{'chunks':>7}{'words':>7}"
+        f"{'recall':>8}{'prec':>7}{'IoU':>7}"
+    )
     lines = [head, "-" * len(head)]
     for r in rows:
         lines.append(
@@ -40,8 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         docs = load_corpus(args.corpus)
         questions = load_questions(args.questions or args.corpus / "questions.yaml", docs)
-        rows = evaluate(docs, questions, args.strategy or DEFAULT, args.k,
-                        args.unit or ["words"])
+        rows = evaluate(docs, questions, args.strategy or DEFAULT, args.k, args.unit or ["words"])
     except (OSError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2

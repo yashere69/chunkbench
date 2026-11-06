@@ -14,8 +14,7 @@ from collections.abc import Callable
 
 Spans = list[tuple[int, int]]
 
-VIRAMA = {"्", "্", "੍", "્", "୍", "்", "్", "್",
-          "്"}
+VIRAMA = {"्", "্", "੍", "્", "୍", "்", "్", "್", "്"}
 JOINERS = {"‌", "‍"}
 
 
