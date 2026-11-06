@@ -1,6 +1,6 @@
 [project]
 name = "chunkbench"
-version = "0.1.0"
+version = "0.2.0"
 description = "Benchmark RAG chunking strategies on your own documents, offline, with token-level recall, precision and IoU."
 readme = "README.md"
 license = { text = "MIT" }

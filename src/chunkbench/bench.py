@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import difflib
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import mean
@@ -30,20 +32,74 @@ def load_corpus(folder: Path) -> dict[str, str]:
     return docs
 
 
-def load_questions(path: Path, docs: dict[str, str]) -> list[Question]:
+def locate(text: str, excerpt: str) -> tuple[int, int] | None:
+    """Find an excerpt verbatim, or with different whitespace.
+
+    Excerpts are usually copied from a rendered page, where line breaks inside a paragraph
+    have become spaces. Matching token by token with any run of whitespace in between finds
+    those without accepting anything looser.
+    """
+    k = text.find(excerpt)
+    if k != -1:
+        return k, k + len(excerpt)
+    tokens = excerpt.split()
+    if not tokens:
+        return None
+    m = re.search(r"\s+".join(re.escape(t) for t in tokens), text)
+    return m.span() if m else None
+
+
+def suggest(text: str, excerpt: str) -> str | None:
+    """The sentence in the document closest to an excerpt that wasn't found."""
+    sentences = [s.strip() for s in re.split(r"(?<=[.?!।])\s+|\n+", text) if s.strip()]
+    close = difflib.get_close_matches(excerpt.strip(), sentences, n=1, cutoff=0.5)
+    return close[0] if close else None
+
+
+def _problems(raw: object, docs: dict[str, str]) -> list[tuple[int, str]]:
+    if not isinstance(raw, list):
+        return [(0, "expected a list of questions")]
     out = []
-    for i, q in enumerate(yaml.safe_load(path.read_text(encoding="utf-8")), start=1):
+    for i, q in enumerate(raw, start=1):
+        if not isinstance(q, dict) or not {"q", "doc", "excerpts"} <= set(q):
+            out.append((i, "needs q, doc and excerpts"))
+            continue
         text = docs.get(q["doc"])
         if text is None:
-            raise ValueError(f"question {i}: unknown doc {q['doc']!r}")
-        spans = []
+            out.append((i, f"unknown doc {q['doc']!r}"))
+            continue
         for ex in q["excerpts"]:
-            k = text.find(ex)
-            if k == -1:
-                raise ValueError(
-                    f"question {i}: excerpt not found verbatim in {q['doc']}: {ex[:60]!r}"
+            if locate(text, ex) is None:
+                hint = suggest(text, ex)
+                out.append(
+                    (
+                        i,
+                        f"excerpt not in {q['doc']}: {ex[:60]!r}"
+                        + (f"; closest sentence: {hint[:80]!r}" if hint else ""),
+                    )
                 )
-            spans.append((k, k + len(ex)))
+    return out
+
+
+def check_questions(path: Path, docs: dict[str, str]) -> list[str]:
+    """Every problem in a question file, instead of stopping at the first."""
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    return [f"question {i}: {msg}" if i else f"{path}: {msg}" for i, msg in _problems(raw, docs)]
+
+
+def load_questions(path: Path, docs: dict[str, str]) -> list[Question]:
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    problems = _problems(raw, docs)
+    if problems:
+        i, msg = problems[0]
+        more = (
+            f" (and {len(problems) - 1} more; run `chunkbench check`)" if len(problems) > 1 else ""
+        )
+        raise ValueError((f"question {i}: " if i else "") + msg + more)
+    out = []
+    for q in raw:
+        text = docs[q["doc"]]
+        spans = [span for ex in q["excerpts"] if (span := locate(text, ex))]
         out.append(Question(q["q"], q["doc"], spans, q.get("lang", "en")))
     return out
 

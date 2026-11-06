@@ -42,7 +42,7 @@ def test_questions_must_quote_the_document(tmp_path):
     docs = {"a.md": "hello world"}
     q = tmp_path / "q.yaml"
     q.write_text("- {q: hi, doc: a.md, excerpts: [goodbye]}\n")
-    with pytest.raises(ValueError, match="not found verbatim"):
+    with pytest.raises(ValueError, match="excerpt not in a.md"):
         load_questions(q, docs)
 
 
@@ -60,3 +60,31 @@ def test_cli(capsys):
     assert main(["run", str(CORPUS)]) == 0
     assert "25 questions" in capsys.readouterr().out
     assert main(["run", "/nonexistent"]) == 2
+
+
+def test_excerpt_with_different_line_breaks_is_found(tmp_path):
+    docs = {"a.md": "Shipping is free on prepaid\norders above 1499. Below that 79."}
+    q = tmp_path / "q.yaml"
+    q.write_text(
+        "- {q: 'free?', doc: a.md, excerpts: ['Shipping is free on prepaid orders above 1499.']}\n"
+    )
+    (question,) = load_questions(q, docs)
+    s, e = question.excerpts[0]
+    assert docs["a.md"][s:e] == "Shipping is free on prepaid\norders above 1499."
+
+
+def test_check_lists_every_problem_with_a_suggestion(tmp_path, capsys):
+    import shutil
+
+    for md in CORPUS.glob("*.md"):
+        shutil.copy(md, tmp_path)
+    (tmp_path / "questions.yaml").write_text(
+        "- {q: otp, doc: shipping-and-returns.md, excerpts: ['We never ask for your card number"
+        " or OTP.']}\n- {q: x, doc: nope.md, excerpts: [a]}\n- {q: y}\n"
+    )
+    assert main(["check", str(tmp_path)]) == 1
+    out = capsys.readouterr().out
+    assert "closest sentence: 'We never ask for your card number, PIN or OTP.'" in out
+    assert "unknown doc 'nope.md'" in out and "needs q, doc and excerpts" in out
+    assert "3 problem(s)" in out
+    assert main(["check", str(CORPUS)]) == 0

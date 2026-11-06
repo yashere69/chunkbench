@@ -7,8 +7,10 @@ import json
 import sys
 from pathlib import Path
 
+import yaml
+
 from . import __version__
-from .bench import evaluate, load_corpus, load_questions
+from .bench import check_questions, evaluate, load_corpus, load_questions
 
 DEFAULT = ["fixed:50,0", "fixed:100,50", "recursive:30", "recursive:60", "headings:120"]
 
@@ -38,12 +40,26 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--unit", action="append", choices=["words", "chars", "graphemes"])
     r.add_argument("-k", type=int, default=2, help="chunks retrieved per question")
     r.add_argument("--json", type=Path)
+    c = sub.add_parser("check", help="validate a question file and suggest fixes")
+    c.add_argument("corpus", type=Path)
+    c.add_argument("--questions", type=Path)
     args = ap.parse_args(argv)
+    if args.cmd == "check":
+        try:
+            docs = load_corpus(args.corpus)
+            problems = check_questions(args.questions or args.corpus / "questions.yaml", docs)
+        except (OSError, ValueError, yaml.YAMLError) as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
+        for line in problems:
+            print(line)
+        print(f"{len(problems)} problem(s)" if problems else "all excerpts found")
+        return 1 if problems else 0
     try:
         docs = load_corpus(args.corpus)
         questions = load_questions(args.questions or args.corpus / "questions.yaml", docs)
         rows = evaluate(docs, questions, args.strategy or DEFAULT, args.k, args.unit or ["words"])
-    except (OSError, ValueError) as e:
+    except (OSError, ValueError, yaml.YAMLError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
     print(f"{len(docs)} documents, {len(questions)} questions, top-{args.k} BM25\n")
