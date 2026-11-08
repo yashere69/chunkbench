@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Output is UTF-8 even when redirected on Windows, where it used to follow the code page
+  and fail on Devanagari text.
+- CI runs the tests on Windows and macOS as well as Linux.
 - Strategy specs are validated: `recursive:0`, `headings:-5` and `fixed:10,-1` used to run
   silently as one-word chunks or with a negative overlap; `fixed:abc` said "invalid literal
   for int()". Each is now an error that names the spec.
