@@ -70,7 +70,9 @@ repeats the table with three retrievers: BM25, WordLlama and their fusion. WordL
 static embedding model whose weights ship in its PyPI wheel, so it runs offline. On the
 English questions it beats BM25 on small chunks (recall 81.9 against 68.6 for
 `recursive:30` at top-2). On the Hindi questions it collapses (28.6 against 85.7), because
-it was trained on English. Reciprocal-rank fusion keeps most of both. A modern
+it was trained on English. Reciprocal-rank fusion lands in between: it matches the better
+of the two on `headings:120` and `fixed:100,50`, but on `recursive:30` it gives up 28
+points of Hindi recall to BM25 (57.1 against 85.7) to gain 6 in English. A modern
 multilingual embedding model would likely do better on Hindi than any of these three. Run
 one through `--embed-url` before trusting a number from this table.
 
