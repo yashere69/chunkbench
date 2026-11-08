@@ -1,17 +1,22 @@
 # chunkbench
 
-Before you pick a chunk size for a RAG system, measure it on your own documents.
-chunkbench chunks a folder of markdown with several strategies, retrieves with BM25 for
-each labelled question, and reports how much of the right text came back (recall) and how
-much padding came with it (precision, IoU). It runs offline in under a second, with no
-embeddings and no keys.
+Chunking choices for RAG, scored the way Chroma's research scored them: by the exact text
+spans that answer each question, not by chunk ids. chunkbench chunks a folder of markdown
+with several strategies and retrieves for each labelled question. Retrieval is BM25 by
+default, a local embedding model, any OpenAI-compatible embedding endpoint, or a fusion of
+BM25 and embeddings. It reports how much of the right text came back (recall) and how much
+padding came with it (precision, IoU). It can compare strategies at an equal word budget
+rather than an equal number of chunks, and it counts Hindi in graphemes, so a chunker that
+splits a conjunct is caught.
 
-![chunkbench output comparing five strategies on English and Hindi questions](docs/demo.png)
+![chunkbench comparing five strategies with BM25 and a BM25+WordLlama fusion at a 100-word budget, on English and Hindi questions](docs/demo.png)
 
 ```bash
 pip install git+https://github.com/yashere69/chunkbench
 chunkbench run examples/corpus
 chunkbench run my-docs/ --questions my-questions.yaml --strategy recursive:80 --strategy headings:200
+chunkbench run my-docs/ --budget 300 --retriever bm25 --retriever hybrid:openai:nomic-embed-text \
+    --embed-url http://localhost:11434/v1     # Ollama; any OpenAI-compatible server works
 ```
 
 ## The metric
@@ -48,9 +53,26 @@ because the documents are already sectioned by topic. Overlap is the worst deal 
 buys a few points of recall and pays for them with repeated text. Your documents will
 differ, and that's the reason to run it on them.
 
-The corpus is small, I wrote both the documents and the questions, and with only 7 Hindi
-questions one question moves the Hindi numbers by 14 points. Treat this as a worked
-example, not a finding about chunking in general.
+The corpus is small, its documents and questions were written for this repository, and with
+only 7 Hindi questions one question moves the Hindi numbers by 14 points. Treat this as a
+worked example, not a finding about chunking in general.
+
+### Equal budgets and other retrievers
+
+Top-2 hides a confound: two 95-word chunks hand the reader twice as much text as two
+45-word chunks, so big chunks win recall partly by reading more. `--budget 100` takes
+best-first chunks until 100 words. Under it, `fixed:100,50`'s English recall falls from 100
+to 88.9, and `recursive:30` rises from 68.6 to 79.7, because it can now take four chunks.
+The strategy ranking changes once each one reads the same amount.
+
+[results/retrievers.md](results/retrievers.md) (`python tools/compare_retrievers.py`)
+repeats the table with three retrievers: BM25, WordLlama and their fusion. WordLlama is a
+static embedding model whose weights ship in its PyPI wheel, so it runs offline. On the
+English questions it beats BM25 on small chunks (recall 81.9 against 68.6 for
+`recursive:30` at top-2). On the Hindi questions it collapses (28.6 against 85.7), because
+it was trained on English. Reciprocal-rank fusion keeps most of both. A modern
+multilingual embedding model would likely do better on Hindi than any of these three. Run
+one through `--embed-url` before trusting a number from this table.
 
 ## Units, and Hindi
 
@@ -110,9 +132,19 @@ question 2: excerpt not in shipping-and-returns.md: 'We never ask for your card 
 - [chunkr's benchmark PR](https://github.com/d1pankarmedhi/chunkr/pull/6) runs Chroma's
   own five-corpus, 472-question benchmark across popular chunking libraries. Use that to
   compare libraries on a standard set; use this to compare settings on your own documents.
-- BM25 only. Embedding retrieval changes which chunks come back, so the best strategy
-  under BM25 may not be the best under embeddings. Adding a pluggable retriever is the
-  next step.
+- Other tools share the name and part of the job.
+  [chunk-bench](https://pypi.org/project/chunk-bench/) (PyPI) ships similar chunkers and
+  scores retrieval by `relevant_terms` keywords, with recall, precision, MRR and F1, but no
+  span-level IoU. [chunkbench-rag](https://pypi.org/project/chunkbench-rag/) is a harness
+  where you bring your own chunker and embedder, with recall@k and a regression gate.
+  chunkbench is the one with Chroma-style span metrics, equal-budget comparison, question
+  files checked against the documents (`chunkbench check`), and grapheme-aware Hindi.
+- The embedding client is plain HTTP. Rate limits are the server's business, and every
+  vector is cached in `.chunkbench-cache/`, so a crashed run resumes where it stopped.
 - No semantic or LLM-based chunkers.
+
+Stable: the question-file format, the metrics and the `run`/`check` commands. Experimental:
+the retriever names and the budget rule (the chunk that would overflow is dropped, never
+truncated).
 
 MIT licensed.

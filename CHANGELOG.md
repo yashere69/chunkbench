@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0
+
+- Pluggable retrievers: `--retriever bm25|wordllama|openai:<model>|hybrid:<dense>`
+  (repeatable). WordLlama runs offline from its PyPI wheel
+  (`pip install "chunkbench[wordllama]"`). `openai:<model>` calls any OpenAI-compatible
+  `/v1/embeddings` endpoint (`--embed-url`) and caches vectors on disk. `hybrid:` fuses BM25
+  with a dense ranking by reciprocal rank.
+- `--budget N`: compare strategies at an equal number of retrieved words instead of top-k.
+- Output gains `retriever` and `context_words` columns.
+- `tools/compare_retrievers.py` writes `results/retrievers.md`.
+
 ## 0.2.0
 
 - Excerpts match across whitespace differences (copied from rendered pages)
