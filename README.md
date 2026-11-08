@@ -149,4 +149,17 @@ Stable: the question-file format, the metrics and the `run`/`check` commands. Ex
 the retriever names and the budget rule (the chunk that would overflow is dropped, never
 truncated).
 
+## Development
+
+```bash
+pip install -e ".[dev,wordllama]"
+ruff check . && ruff format --check . && mypy src && pytest
+python tools/compare_retrievers.py    # regenerates results/retrievers.md
+```
+
+A new chunker returns character spans into the original text, never copied strings; the
+metrics depend on it. A new retriever implements `rank(query)` (see
+`src/chunkbench/retrieve.py`) and is added to `build()` there, so `--retriever` and `hybrid:`
+pick it up.
+
 MIT licensed.
