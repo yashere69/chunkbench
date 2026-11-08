@@ -11,20 +11,22 @@ import yaml
 
 from . import __version__
 from .bench import check_questions, evaluate, load_corpus, load_questions
+from .retrieve import RETRIEVERS
 
 DEFAULT = ["fixed:50,0", "fixed:100,50", "recursive:30", "recursive:60", "headings:120"]
 
 
 def render(rows: list[dict]) -> str:
     head = (
-        f"{'strategy':<16}{'lang':<6}{'unit':<11}{'chunks':>7}{'words':>7}"
-        f"{'recall':>8}{'prec':>7}{'IoU':>7}"
+        f"{'strategy':<15}{'retriever':<17}{'lang':<5}{'unit':<10}{'chunks':>7}{'words':>6}"
+        f"{'context':>8}{'recall':>8}{'prec':>7}{'IoU':>7}"
     )
     lines = [head, "-" * len(head)]
     for r in rows:
         lines.append(
-            f"{r['strategy']:<16}{r['lang']:<6}{r['unit']:<11}{r['chunks']:>7}"
-            f"{r['avg_words']:>7}{r['recall']:>8}{r['precision']:>7}{r['iou']:>7}"
+            f"{r['strategy']:<15}{r['retriever']:<17}{r['lang']:<5}{r['unit']:<10}"
+            f"{r['chunks']:>7}{r['avg_words']:>6}{r['context_words']:>8}"
+            f"{r['recall']:>8}{r['precision']:>7}{r['iou']:>7}"
         )
     return "\n".join(lines)
 
@@ -39,6 +41,20 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--strategy", action="append", help=f"repeatable (default: {DEFAULT})")
     r.add_argument("--unit", action="append", choices=["words", "chars", "graphemes"])
     r.add_argument("-k", type=int, default=2, help="chunks retrieved per question")
+    r.add_argument(
+        "--budget",
+        type=int,
+        help="retrieve best-first chunks up to this many words instead of top-k (fairer "
+        "across chunk sizes)",
+    )
+    r.add_argument("--retriever", action="append", help=f"repeatable: {RETRIEVERS}")
+    r.add_argument("--embed-url", help="OpenAI-compatible base URL for openai:<model>")
+    r.add_argument(
+        "--cache",
+        type=Path,
+        default=Path(".chunkbench-cache/embeddings.jsonl"),
+        help="where embeddings from --embed-url are cached",
+    )
     r.add_argument("--json", type=Path)
     c = sub.add_parser("check", help="validate a question file and suggest fixes")
     c.add_argument("corpus", type=Path)
@@ -58,11 +74,24 @@ def main(argv: list[str] | None = None) -> int:
     try:
         docs = load_corpus(args.corpus)
         questions = load_questions(args.questions or args.corpus / "questions.yaml", docs)
-        rows = evaluate(docs, questions, args.strategy or DEFAULT, args.k, args.unit or ["words"])
+        if args.budget is not None and args.budget < 1:
+            raise ValueError("--budget must be a positive number of words")
+        rows = evaluate(
+            docs,
+            questions,
+            args.strategy or DEFAULT,
+            args.k,
+            args.unit or ["words"],
+            args.retriever or ["bm25"],
+            args.budget,
+            args.embed_url,
+            args.cache,
+        )
     except (OSError, ValueError, yaml.YAMLError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
-    print(f"{len(docs)} documents, {len(questions)} questions, top-{args.k} BM25\n")
+    picked = f"up to {args.budget} words" if args.budget else f"top-{args.k}"
+    print(f"{len(docs)} documents, {len(questions)} questions, {picked} per question\n")
     print(render(rows))
     if args.json:
         args.json.write_text(json.dumps(rows, indent=1, ensure_ascii=False), encoding="utf-8")

@@ -12,7 +12,7 @@ import yaml
 
 from .chunkers import parse
 from .metrics import score
-from .retrieve import BM25
+from .retrieve import build
 from .units import UNITS
 
 
@@ -104,38 +104,69 @@ def load_questions(path: Path, docs: dict[str, str]) -> list[Question]:
     return out
 
 
+def select(ranked: list[int], sizes: list[int], k: int, budget: int | None) -> list[int]:
+    """Top k, or with a budget, best-first chunks until the next would exceed it (always at
+    least one). A budget compares chunkers fairly: two 100-word chunks give the reader
+    twice the text of two 50-word chunks, and top-k hides that."""
+    if budget is None:
+        return ranked[:k]
+    out: list[int] = []
+    used = 0
+    for i in ranked:
+        if out and used + sizes[i] > budget:
+            break
+        out.append(i)
+        used += sizes[i]
+    return out
+
+
 def evaluate(
     docs: dict[str, str],
     questions: list[Question],
     strategies: list[str],
     k: int,
     unit_names: list[str],
+    retrievers: list[str] | None = None,
+    budget: int | None = None,
+    embed_url: str | None = None,
+    cache: Path | None = None,
 ) -> list[dict]:
     units = {u: {name: UNITS[u](text) for name, text in docs.items()} for u in unit_names}
     rows = []
     for spec in strategies:
         label, chunker = parse(spec)
         chunks = [(name, s, e) for name, text in docs.items() for s, e in chunker(text)]
-        index = BM25([docs[n][s:e] for n, s, e in chunks])
-        per_lang: dict[tuple[str, str], list] = {}
-        for q in questions:
-            got = [chunks[i] for i in index.top(q.text, k)]
-            rel = [(q.doc, s, e) for s, e in q.excerpts]
-            for u in unit_names:
-                per_lang.setdefault((u, q.lang), []).append(score(units[u], rel, got))
-        sizes = [len(docs[n][s:e].split()) for n, s, e in chunks]
-        for (u, lang), scores in sorted(per_lang.items()):
-            rows.append(
-                {
-                    "strategy": label,
-                    "unit": u,
-                    "lang": lang,
-                    "questions": len(scores),
-                    "chunks": len(chunks),
-                    "avg_words": round(mean(sizes), 1),
-                    "recall": round(100 * mean(s.recall for s in scores), 1),
-                    "precision": round(100 * mean(s.precision for s in scores), 1),
-                    "iou": round(100 * mean(s.iou for s in scores), 1),
-                }
-            )
+        texts = [docs[n][s:e] for n, s, e in chunks]
+        words = [len(t.split()) for t in texts]
+        for rname in retrievers or ["bm25"]:
+            index = build(rname, texts, embed_url, cache)
+            rows += _score_one(label, rname, index, chunks, words, questions, units, k, budget)
     return rows
+
+
+def _score_one(label, rname, index, chunks, words, questions, units, k, budget) -> list[dict]:
+    per_lang: dict[tuple[str, str], list] = {}
+    taken: list[int] = []
+    for q in questions:
+        picked = select(index.rank(q.text), words, k, budget)
+        taken.append(sum(words[i] for i in picked))
+        got = [chunks[i] for i in picked]
+        rel = [(q.doc, s, e) for s, e in q.excerpts]
+        for u in units:
+            per_lang.setdefault((u, q.lang), []).append(score(units[u], rel, got))
+    return [
+        {
+            "strategy": label,
+            "retriever": rname,
+            "unit": u,
+            "lang": lang,
+            "questions": len(scores),
+            "chunks": len(chunks),
+            "avg_words": round(mean(words), 1) if words else 0.0,
+            "context_words": round(mean(taken), 1) if taken else 0.0,
+            "recall": round(100 * mean(s.recall for s in scores), 1),
+            "precision": round(100 * mean(s.precision for s in scores), 1),
+            "iou": round(100 * mean(s.iou for s in scores), 1),
+        }
+        for (u, lang), scores in sorted(per_lang.items())
+    ]
