@@ -116,7 +116,14 @@ def _trim(text: str, s: int, e: int) -> tuple[int, int]:
 def parse(spec: str) -> tuple[str, Chunker]:
     """'fixed:200,50', 'recursive:200', 'headings:300' -> (label, chunker)."""
     name, _, args = spec.partition(":")
-    nums = [int(x) for x in args.split(",") if x] if args else []
+    try:
+        nums = [int(x) for x in args.split(",") if x] if args else []
+    except ValueError:
+        raise ValueError(f"strategy {spec!r}: sizes must be whole numbers of words") from None
+    if any(n <= 0 for n in nums[:1]) or any(n < 0 for n in nums[1:]):
+        raise ValueError(f"strategy {spec!r}: size must be positive and overlap not negative")
+    if name != "fixed" and len(nums) > 1:
+        raise ValueError(f"strategy {spec!r}: only fixed takes an overlap")
     if name == "fixed":
         return spec, fixed(nums[0] if nums else 200, nums[1] if len(nums) > 1 else 0)
     if name == "recursive":

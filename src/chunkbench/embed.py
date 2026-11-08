@@ -17,6 +17,7 @@ import hashlib
 import json
 import math
 import os
+import urllib.error
 import urllib.request
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -64,9 +65,20 @@ class OpenAIEmbedder:
         if key := os.environ.get("CHUNKBENCH_API_KEY"):
             headers["Authorization"] = f"Bearer {key}"
         req = urllib.request.Request(f"{self.url}/embeddings", data=body, headers=headers)
-        with urllib.request.urlopen(req, timeout=120) as r:
-            data = json.load(r)["data"]
-        return [row["embedding"] for row in sorted(data, key=lambda row: row["index"])]
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                data = json.load(r)["data"]
+            return [row["embedding"] for row in sorted(data, key=lambda row: row["index"])]
+        except urllib.error.HTTPError as err:
+            hint = " (set CHUNKBENCH_API_KEY?)" if err.code in (401, 403) else ""
+            raise ValueError(f"{self.url}/embeddings answered HTTP {err.code}{hint}") from err
+        except (urllib.error.URLError, TimeoutError) as err:
+            reason = getattr(err, "reason", err)
+            raise ValueError(f"can't reach {self.url}/embeddings ({reason})") from err
+        except (KeyError, TypeError, ValueError) as err:
+            raise ValueError(
+                f"{self.url}/embeddings didn't return an OpenAI-style embeddings response"
+            ) from err
 
     def __call__(self, texts: list[str]) -> list[list[float]]:
         missing = [t for t in dict.fromkeys(texts) if self._key(t) not in self.cache]

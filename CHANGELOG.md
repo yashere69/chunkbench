@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Strategy specs are validated: `recursive:0`, `headings:-5` and `fixed:10,-1` used to run
+  silently as one-word chunks or with a negative overlap; `fixed:abc` said "invalid literal
+  for int()". Each is now an error that names the spec.
+- A question file that isn't valid YAML is reported with its path and line.
+- An embedding server that can't be reached, refuses the key, or answers in the wrong shape
+  gives one line naming the URL, instead of a urllib error.
+
 ## 0.3.0
 
 - Pluggable retrievers: `--retriever bm25|wordllama|openai:<model>|hybrid:<dense>`

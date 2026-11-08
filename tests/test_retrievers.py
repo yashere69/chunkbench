@@ -86,3 +86,10 @@ def test_wordllama_runs_offline_when_installed():
     pytest.importorskip("wordllama")
     dense = build("wordllama", ["the return window is seven days", "colour may bleed"])
     assert dense.rank("how many days do I have to send it back")[0] == 0
+
+
+def test_unreachable_embedding_server_is_a_clean_error(tmp_path, capsys):
+    corpus = str(Path(__file__).resolve().parent.parent / "examples" / "corpus")
+    args = ["run", corpus, "--retriever", "openai:x", "--embed-url", "http://127.0.0.1:9/v1"]
+    assert main([*args, "--cache", str(tmp_path / "c")]) == 2
+    assert "can't reach http://127.0.0.1:9/v1/embeddings" in capsys.readouterr().err

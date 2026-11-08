@@ -7,6 +7,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import mean
+from typing import Any
 
 import yaml
 
@@ -81,14 +82,23 @@ def _problems(raw: object, docs: dict[str, str]) -> list[tuple[int, str]]:
     return out
 
 
+def _read_yaml(path: Path) -> Any:
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    except yaml.YAMLError as e:
+        mark = getattr(e, "problem_mark", None)
+        where = f" at line {mark.line + 1}" if mark else ""
+        raise ValueError(f"{path}: not valid YAML{where}") from e
+
+
 def check_questions(path: Path, docs: dict[str, str]) -> list[str]:
     """Every problem in a question file, instead of stopping at the first."""
-    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    raw = _read_yaml(path)
     return [f"question {i}: {msg}" if i else f"{path}: {msg}" for i, msg in _problems(raw, docs)]
 
 
 def load_questions(path: Path, docs: dict[str, str]) -> list[Question]:
-    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    raw = _read_yaml(path)
     problems = _problems(raw, docs)
     if problems:
         i, msg = problems[0]

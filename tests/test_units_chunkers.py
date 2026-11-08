@@ -45,3 +45,11 @@ def test_parse():
     assert parse("fixed:10,2")[0] == "fixed:10,2"
     with pytest.raises(ValueError):
         parse("semantic:100")
+
+
+@pytest.mark.parametrize(
+    "spec", ["fixed:abc", "fixed:0", "recursive:0", "headings:-5", "fixed:10,-1", "recursive:50,10"]
+)
+def test_bad_strategy_specs_are_rejected(spec):
+    with pytest.raises(ValueError, match="strategy"):
+        parse(spec)
